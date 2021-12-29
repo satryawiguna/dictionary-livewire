@@ -25,7 +25,7 @@ class CreateContactsTable extends Migration
             $table->string('address')->nullable();
             $table->string('phone')->nullable();
             $table->string('mobile')->nullable();
-            $table->string('photo');
+            $table->string('photo')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')
