@@ -1,64 +1,115 @@
 <div>
-    <div class="py-12">
+    <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <div class="flex flex-row">
-                        <form wire:submit.prevent="handleStore" class="w-full">
-                            <div class="w-full">
-                                <x-label for="type" :value="__('Type')" />
-
-                                <select wire:model="type" class="block rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 w-full">
-                                    <option value="word" selected>Word</option>
-                                    <option value="phrase">Phrase</option>
-                                </select>
-                            </div>
-                            <div class="w-full mt-4">
-                                <x-label for="category" :value="__('Category')" />
-
-                                <div wire:ignore>
-                                    <select wire:model="category" id="category" class="block rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 w-full p-4">
-                                        <option value="">Select Option</option>
-                                        @foreach($categories as $value)
-                                            <option value="{{ $value['id'] }}">{{ $value['name'] }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="flex flex-row mt-4">
-                                <div class="basis-1/2 pr-4">
-                                    <x-label for="ind" :value="__('Bahasa (IND)')" />
-
-                                    <textarea name="ind" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="5"></textarea>
-                                </div>
-                                <div class="basis-1/2 pl-4">
-                                    <x-label for="en" :value="__('English (EN)')" />
-
-                                    <textarea name="en" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="5"></textarea>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-start mt-4">
-                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                                    Submit Dictionary
-                                </button>
-                            </div>
-                        </form>
+                        @if($isUpdate)
+                            <livewire:dictionary.dictionary-update></livewire:dictionary.dictionary-update>
+                        @else
+                            <livewire:dictionary.dictionary-create></livewire:dictionary.dictionary-create>
+                        @endif
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    @foreach($dictionaries as $dictionary)
-        <div class="py-2">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 bg-white border-b border-gray-200">
+    <div class="pb-10">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 bg-white border-b border-gray-200">
+                    <div class="flex justify-between mt-4">
+                        <select wire:model="pageSize" class="block rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                        </select>
+
+                        <div class="flex flex-row gap-5">
+                            <select wire:model="searchType" class="block rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 w-full">
+                                <option value="">Select Option</option>
+                                <option value="word">Word</option>
+                                <option value="phrase">Phrase</option>
+                            </select>
+
+                            <div wire:ignore>
+                                <select wire:model="searchCategory" id="search-category" class="block rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 w-150 p-4">
+                                    <option value="">Select Option</option>
+                                    @foreach($categories as $value)
+                                        <option value="{{ $value['id'] }}">{{ $value['name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <input wire:model="search" class="block rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" type="text" name="search" />
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
-    @endforeach
+    </div>
+
+    @if($dictionaries->total() > 0)
+        @foreach($dictionaries as $dictionary)
+            <div class="pb-10">
+                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div class="p-6 bg-white border-b border-gray-200">
+                            <div class="flex flex-col gap-5">
+                                <div class="flex flex-row gap-10">
+                                    <div>
+                                        <x-label for="type" :value="__('Type')" />
+                                        {{ ucwords($dictionary->type) }}
+                                    </div>
+
+                                    <div>
+                                        <x-label for="category" :value="__('Category')" />
+                                        {{ $dictionary->category->name }}
+                                    </div>
+
+                                    <div class="flex flex-row gap-10 w-full">
+                                        <div class="flex flex-row items-center gap-5 basis-1/2">
+                                            <div class="aspect-square w-10">
+                                                <img src="{{ asset('assets/indonesia.png') }}" class="object-cover" />
+                                            </div>
+                                            <p>
+                                                {{ $dictionary->vocab_id }}
+                                            </p>
+                                        </div>
+                                        <div class="flex flex-row items-center gap-5 basis-1/2">
+                                            <div class="aspect-square w-10">
+                                                <img src="{{ asset('assets/united-kingdom.png') }}" class="object-cover" />
+                                            </div>
+                                            <p>
+                                                {{ $dictionary->vocab_en }}
+                                            </p>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="flex flex-row gap-2">
+                                    <button type="button" wire:click="handleEdit({{ $dictionary->id }})" class="bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-2 px-4 rounded">Edit</button>
+                                    <button type="button" wire:click="handleDelete({{ $dictionary->id }})" class="bg-red-500 hover:bg-red-700 text-sm text-white font-bold py-2 px-4 rounded">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    @else
+        <div class="pb-10">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 bg-white border-b border-gray-200">
+                        No data available
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 
 @push('styles')
@@ -79,10 +130,10 @@
 @push('scripts')
     <script>
         $(document).ready(function () {
-            $('#category').select2();
-            $('#category').on('change', function (e) {
-                var data = $('#category').select2("val");
-                @this.set('category', data);
+            $('#search-category').select2();
+            $('#search-category').on('change', function (e) {
+                var data = $('#search-category').select2("val");
+                @this.set('searchCategory', data);
             });
         });
     </script>
